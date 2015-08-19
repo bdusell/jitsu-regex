@@ -1,0 +1,8 @@
+{
+  "name": "jitsu/regex",
+  "autoload": {
+    "psr-4": {
+      "Jitsu\\": "src/"
+    }
+  }
+}
