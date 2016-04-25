@@ -129,6 +129,8 @@ class RegexUtil {
 	}
 
 	/**
+	 * Get all non-overlapping matches of a regular expression in a string.
+	 *
 	 * @param string $regex
 	 * @param string $str
 	 * @param int $offset
@@ -148,6 +150,9 @@ class RegexUtil {
 	}
 
 	/**
+	 * Get all non-overlapping matches of a regular expression in a string
+	 * along with offset information.
+	 *
 	 * @param string $regex
 	 * @param string $str
 	 * @param int $offset
@@ -221,8 +226,8 @@ class RegexUtil {
 	 * returned.
 	 *
 	 * @param string|string[] $regex
-	 * @param string|string[]|callable $replacement
 	 * @param string|string[] $str
+	 * @param string|string[]|callable $replacement
 	 * @param int|null $limit
 	 * @return string|string[]
 	 * @throws \RuntimeException
@@ -231,6 +236,17 @@ class RegexUtil {
 		return self::_replace($regex, $replacement, $str, $limit, false);
 	}
 
+	/**
+	 * Like `replace`, but include the number of replacements as a second
+	 * return value.
+	 *
+	 * @param string|string[] $regex
+	 * @param string|string[] $str
+	 * @param string|string[]|callable $replacement
+	 * @param int|null $limit
+	 * @return array The pair `array($replaced, $count)`.
+	 * @throws \RuntimeException
+	 */
 	public static function replaceAndCount($regex, $str, $replacement, $limit = null) {
 		return self::_replace($regex, $replacement, $str, $limit, true);
 	}
@@ -257,11 +273,28 @@ class RegexUtil {
 	 * interpreted as a callback.
 	 *
 	 * This allows function names, etc. to be passed.
+	 *
+	 * @param string|string[] $regex
+	 * @param string|string[] $str
+	 * @param callable $callback
+	 * @param int|null $limit
+	 * @return string|string[]
+	 * @throws \RuntimeException
 	 */
 	public static function replaceWith($regex, $str, $callback, $limit = null) {
 		return self::_replaceWith($regex, $callback, $str, $limit, false);
 	}
 
+	/**
+	 * Like `replaceWith` but with the number of replacements included.
+	 *
+	 * @param string|string[] $regex
+	 * @param string|string[] $str
+	 * @param callable $callback
+	 * @param int|null $limit
+	 * @return array The pair `array($replaced, $count)`.
+	 * @throws \RuntimeException
+	 */
 	public static function replaceAndCountWith($regex, $str, $callback, $limit = null) {
 		return self::_replaceWith($regex, $callback, $str, $limit, true);
 	}
@@ -283,13 +316,30 @@ class RegexUtil {
 	 * Same behavior as `replace`, except that when `$strs` is an array,
 	 * only strings which had a replacement performed are returned in the
 	 * resulting array.
+	 *
+	 * @param string|string[] $regex
+	 * @param string|string[] $strs
+	 * @param string|string[]|callable $replacement
+	 * @param int|null $limit
+	 * @return string|string[]
+	 * @throws \RuntimeException
 	 */
-	public static function replaceAndFilter($regex, $str, $replacement, $limit = null) {
-		return self::_replaceFilter($regex, $replacement, $str, $limit, false);
+	public static function replaceAndFilter($regex, $strs, $replacement, $limit = null) {
+		return self::_replaceFilter($regex, $replacement, $strs, $limit, false);
 	}
 
-	public static function replaceAndFilterAndCount($regex, $str, $replacement, $limit = null) {
-		return self::_replaceFilter($regex, $replacement, $str, $limit, true);
+	/**
+	 * Like `replaceAndFilter` but with the number of replacements included.
+	 *
+	 * @param string|string[] $regex
+	 * @param string|string[] $strs
+	 * @param string|string[]|callable $replacement
+	 * @param int|null $limit
+	 * @return array The pair `array($replaced, $count)`.
+	 * @throws \RuntimeException
+	 */
+	public static function replaceAndFilterAndCount($regex, $strs, $replacement, $limit = null) {
+		return self::_replaceFilter($regex, $replacement, $strs, $limit, true);
 	}
 
 	private static function _replaceFilter($regex, $replacement, $str, $limit, $use_count) {
@@ -305,7 +355,12 @@ class RegexUtil {
 
 	/**
 	 * Test a regular expression against an array of strings and return
-	 * those strings which match (the result is not reindexed).
+	 * those strings which match.
+	 *
+	 * @param string $regex
+	 * @param string[] $strs
+	 * @return string[] The result is not re-indexed.
+	 * @throws \RuntimeException
 	 */
 	public static function grep($regex, $strs) {
 		$r = preg_grep($regex, $strs);
@@ -316,6 +371,11 @@ class RegexUtil {
 	/**
 	 * Same as `grep`, except that all of the strings which do *not* match
 	 * the regular expression are returned.
+	 *
+	 * @param string $regex
+	 * @param string[] $strs
+	 * @return string[] The result is not re-indexed.
+	 * @throws \RuntimeException
 	 */
 	public static function invertedGrep($regex, $strs) {
 		$r = preg_grep($regex, $strs, PREG_GREP_INVERT);
@@ -337,22 +397,53 @@ class RegexUtil {
 	/**
 	 * Split a string by a regular expression. Optionally provide a limit
 	 * to the number of splits.
+	 *
+	 * @param string $regex
+	 * @param string $str
+	 * @param int|null $limit
+	 * @return string[]
+	 * @throws \RuntimeException
 	 */
 	public static function split($regex, $str, $limit = null) {
 		return self::_split($regex, $str, $limit, 0, false);
 	}
 
+	/**
+	 * Like `split` but with offsets included as a second return value.
+	 *
+	 * @param string $regex
+	 * @param string $str
+	 * @param int|null $limit
+	 * @return array The pair `array($parts, $offsets)`.
+	 * @throws \RuntimeException
+	 */
 	public static function splitWithOffsets($regex, $str, $limit = null) {
 		return self::_split($regex, $str, $limit, 0, true);
 	}
 
 	/**
-	 * Like `split`, but filter out empty strings from the result.
+	 * Like `split`, but filters out empty strings from the result.
+	 *
+	 * @param string $regex
+	 * @param string $str
+	 * @param int|null $limit
+	 * @return string[]
+	 * @throws \RuntimeException
 	 */
 	public static function splitAndFilter($regex, $str, $limit = null) {
 		return self::_split($regex, $str, $limit, PREG_SPLIT_NO_EMPTY, false);
 	}
 
+	/**
+	 * Like `splitAndFilter` but with offsets included as a second return
+	 * value.
+	 *
+	 * @param string $regex
+	 * @param string $str
+	 * @param int|null $limit
+	 * @return array The pair `array($parts, $offsets)`.
+	 * @throws \RuntimeException
+	 */
 	public static function splitAndFilterWithOffsets($regex, $str, $limit = null) {
 		return self::_split($regex, $str, $limit, PREG_SPLIT_NO_EMPTY, true);
 	}
@@ -360,11 +451,27 @@ class RegexUtil {
 	/**
 	 * Like `split`, except include group 1 of the splitting pattern in the
 	 * results as well.
+	 *
+	 * @param string $regex
+	 * @param string $str
+	 * @param int|null $limit
+	 * @return string[]
+	 * @throws \RuntimeException
 	 */
 	public static function inclusiveSplit($regex, $str, $limit = null) {
 		return self::_split($regex, $str, $limit, PREG_SPLIT_DELIM_CAPTURE, false);
 	}
 
+	/**
+	 * Like `inclusiveSplit` but with offsets included as a second return
+	 * value.
+	 *
+	 * @param string $regex
+	 * @param string $str
+	 * @param int|null $limit
+	 * @return array The pair `array($parts, $offsets)`.
+	 * @throws \RuntimeException
+	 */
 	public static function inclusiveSplitWithOffsets($regex, $str, $limit = null) {
 		return self::_split($regex, $str, $limit, PREG_SPLIT_DELIM_CAPTURE, true);
 	}

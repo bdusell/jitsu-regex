@@ -2,7 +2,10 @@
 
 namespace Jitsu;
 
-class RegexUtilMatchWithOffsets {
+/**
+ * A regular expression match with match offset data.
+ */
+class RegexUtilMatchWithOffsets extends RegexUtilMatch {
 
 	private $offsets;
 
